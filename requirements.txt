@@ -1,0 +1,4 @@
+gradio>=4.0
+onnx>=1.14
+numpy
+onnxruntime  # optional: used to double-check exported models

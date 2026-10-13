@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+
+# Gradio
+.gradio/
+flagged/
+
+# Models (keep large / private models out of the repo)
+*.onnx
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ...but keep the public demo model
+!examples/*.onnx
