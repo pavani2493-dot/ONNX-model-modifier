@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ONNX Model Modifier</title>
+<meta name="description" content="View and edit ONNX models in your browser: a Netron-style graph viewer with node renaming, bypass-deletion and export.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="bar">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="2" y="2" width="8" height="6" rx="1.5" fill="#335588"/><rect x="14" y="9" width="8" height="6" rx="1.5" fill="#702921"/><rect x="2" y="16" width="8" height="6" rx="1.5" fill="#335533"/><path d="M6 8v8M10 5h4v4M14 12h-4v4" stroke="#333" stroke-width="1.4" fill="none"/></svg>
+    <span>ONNX Model Modifier</span>
+  </div>
+  <div id="modelinfo" class="info"></div>
+  <div class="actions">
+    <input id="find" type="search" placeholder="Find node…" list="nodenames" autocomplete="off" disabled>
+    <datalist id="nodenames"></datalist>
+    <button id="openBtn" class="btn">Open model</button>
+    <button id="checkBtn" class="btn" disabled title="Load the model in ONNX Runtime (Web) to check it is valid">Validate</button>
+    <button id="exportBtn" class="btn primary" disabled>Export .onnx</button>
+    <input id="fileInput" type="file" accept=".onnx" hidden>
+  </div>
+</header>
+
+<nav id="tabs" role="tablist" hidden>
+  <button role="tab" id="tabGraph" class="tab active" aria-selected="true">Graph</button>
+  <button role="tab" id="tabModify" class="tab" aria-selected="false">Modify</button>
+</nav>
+
+<main id="main">
+  <section id="welcome">
+    <div class="drop" id="drop">
+      <h1>View and edit ONNX models</h1>
+      <p>A Netron-style graph viewer that also lets you rename nodes, remove nodes and export the result. Everything runs in your browser, so your model is never uploaded anywhere.</p>
+      <button id="openBtn2" class="btn primary big">Open an ONNX model</button>
+      <p class="hint">…or drag and drop a <code>.onnx</code> file here</p>
+      <div id="demos"></div>
+    </div>
+  </section>
+
+  <section id="viewer" hidden>
+    <div id="wrap"><svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg></div>
+    <div id="tools">
+      <button id="zin" title="Zoom in (Ctrl + wheel)">+</button>
+      <button id="zout" title="Zoom out">−</button>
+      <button id="zfit" title="Fit to screen">⤢</button>
+      <button id="z1" title="Actual size">1:1</button>
+    </div>
+    <aside id="side" hidden>
+      <button class="close" id="closeSide" aria-label="Close">×</button>
+      <div id="sideContent"></div>
+    </aside>
+  </section>
+
+  <section id="modifyView" hidden>
+    <div class="mod">
+      <div class="card">
+        <label for="nodeSelect" class="lbl">Node</label>
+        <select id="nodeSelect"></select>
+        <div class="lbl" style="margin-top:14px">Node details</div>
+        <pre id="nodeDetails" class="details">Pick a node to see its details.</pre>
+      </div>
+
+      <div class="card">
+        <label for="newName" class="lbl">New name</label>
+        <input type="text" id="newName" placeholder="Pick a node first" disabled>
+        <div class="btnrow">
+          <button class="btn" id="modRename" disabled>Rename node</button>
+          <button class="btn danger" id="modDelete" disabled>Delete node (bypass)</button>
+        </div>
+        <p class="note">Delete removes the node and connects whatever came after it to its input. It works for nodes with one data input and one output (Relu, Dropout, Identity, Q/DQ…). In quantized models, remove Quantize/Dequantize nodes in pairs.</p>
+        <div class="lbl" style="margin-top:14px">Status</div>
+        <div id="modStatus" class="status">No changes yet.</div>
+      </div>
+
+      <div class="card">
+        <button class="btn primary" id="modExport">Validate &amp; export model</button>
+        <div id="exportStatus" class="status">Checks the model with ONNX Runtime, then downloads it as <code>*_modified.onnx</code>.</div>
+      </div>
+    </div>
+  </section>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="busy" hidden><div class="spinner"></div><span id="busyText">Loading…</span></div>
+</main>
+
+<script src="lib/protobuf.min.js"></script>
+<script src="lib/dagre.min.js"></script>
+<script src="lib/onnx-defs.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

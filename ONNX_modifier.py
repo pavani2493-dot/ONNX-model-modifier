@@ -557,13 +557,18 @@ with gr.Blocks(title="ONNX Modifier") as app:
             msg = f"WARNING - the model is broken by your edits: {str(e)[:400]}"
         return f"{msg} Saved – use the download box.", out_path
 
-    demo_path = os.path.join(HERE, "examples", "demo_resnet.onnx")
-    if os.path.exists(demo_path):
+    # Every .onnx file in the examples/ folder becomes a one-click demo button
+    examples_dir = os.path.join(HERE, "examples")
+    demo_files = sorted(
+        os.path.join(examples_dir, f) for f in os.listdir(examples_dir)
+        if f.lower().endswith(".onnx")
+    ) if os.path.isdir(examples_dir) else []
+    if demo_files:
         with examples_box:
-            gr.Examples(examples=[[demo_path]], inputs=model_input,
+            gr.Examples(examples=[[p] for p in demo_files], inputs=model_input,
                         outputs=[model_state, graph_html, info, node_dd], fn=on_upload,
                         run_on_click=True, cache_examples=False,
-                        label="No ONNX file? Click to try a demo model (small ResNet)")
+                        label="No ONNX file? Click a demo model to try it")
 
     model_input.upload(on_upload, model_input, [model_state, graph_html, info, node_dd])
     model_input.clear(on_upload, model_input, [model_state, graph_html, info, node_dd])
